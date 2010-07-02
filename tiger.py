@@ -15,16 +15,18 @@ def tiger_compress(str, r1, r2, r3):
     x7 = str[7]
 
     # compress
-    save_abc
+    aa = a
+    bb = b
+    cc = c
     for i in range(0, 2):
         if i != 0:
             key_schedule
         if i == 0:
-            tiger_pass(a,b,c,0)
+            tiger_pass(a,b,c,5)
         if i == 1:
-            tiger_pass(a,b,c,1)
+            tiger_pass(a,b,c,7)
         if i == 2:
-            tiger_pass(a,b,c,2)
+            tiger_pass(a,b,c,9)
         tmpa = a
         a = c
         c = b
