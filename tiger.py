@@ -1,19 +1,20 @@
 
+def tiger_pass(a,b,c,mul, str):
+    tiger_round(a,b,c, str[0], mul)
+    tiger_round(b,c,a,str[1],mul)
+    tiger_round(c,a,b, str[2], mul)
+    tiger_round(a,b,c,str[3],mul)
+    tiger_round(b,c,a,str[4],mul)
+    tiger_round(c,a,b,str[5],mul)
+    tiger_round(a,b,c,str[6],mul)
+    tiger_round(b,c,a,str[7],mul)
+
 def tiger_compress(str, r1, r2, r3):
     #setup
     a = r1
     b = r2
     c = r3
     
-    x0 = str[0]
-    x1 = str[1]
-    x2 = str[2]
-    x3 = str[3]
-    x4 = str[4]
-    x5 = str[5]
-    x6 = str[6]
-    x7 = str[7]
-
     # compress
     aa = a
     bb = b
@@ -22,16 +23,18 @@ def tiger_compress(str, r1, r2, r3):
         if i != 0:
             key_schedule
         if i == 0:
-            tiger_pass(a,b,c,5)
+            tiger_pass(a,b,c,5, str)
         if i == 1:
-            tiger_pass(a,b,c,7)
+            tiger_pass(a,b,c,7, str)
         if i == 2:
-            tiger_pass(a,b,c,9)
+            tiger_pass(a,b,c,9, str)
         tmpa = a
         a = c
         c = b
         b = tmpa
-    feed_forward
+    a ^= aa
+    b -= bb
+    c += cc
 
     # map values out
     r1 = a
