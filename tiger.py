@@ -1,7 +1,4 @@
-t1 = []
-t2 = []
-t3 = []
-t4 = []
+from sboxes import t1, t2, t3, t4
 
 def tiger_round(a,b,c,x,mul):
     c ^= ord(x)
