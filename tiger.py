@@ -1,7 +1,7 @@
 from sboxes import t1, t2, t3, t4
 
 def tiger_round(a,b,c,x,mul):
-    c ^= ord(x)
+    c ^= x
     a -= t1[((c) >> (0*8))&0xFF] ^ t2[((c) >> ( 2*8)) & 0xFF] ^ t3[((c) >> (4*8))&0xFF] ^ t4[((c) >> ( 6*8)) & 0xFF]
     b += t4[((c) >> (1*8))&0xFF] ^ t3[((c) >> ( 3*8)) & 0xFF] ^ t2[((c) >> (5*8))&0xFF] ^ t1[((c) >> ( 7*8)) & 0xFF] 
     b *= mul
@@ -22,19 +22,40 @@ def tiger_compress(str, r1, r2, r3):
     b = r2
     c = r3
     
+    x = []
+
+    for i in range(0,8):
+        x.append( ord(str[i]) )
+
     # compress
     aa = a
     bb = b
     cc = c
     for i in range(0, 2):
         if i != 0:
-            key_schedule
+            x[0] -= x[7] ^  0xA5A5A5A5A5A5A5A5
+            x[1] ^= x[0]
+            x[2] += x[1]
+            x[3] -= x[2] ^ ((~x[1]) << 19)
+            x[4] ^= x[3]
+            x[5] += x[4]
+            x[6] -= x[5] ^ ((~x[4]) >> 23)
+            x[7] ^= x[6]
+            x[0] += x[7]
+            x[1] -= x[0] ^ ((~x[7])<<19)
+            x[2] ^= x[1]
+            x[3] += x[2] 
+            x[4] -= x[3] ^ ((~x[2])>>23)
+            x[5] ^= x[4] 
+            x[6] += x[5] 
+            x[7] -= x[6] ^ 0x0123456789ABCDEF
+
         if i == 0:
-            tiger_pass(a,b,c,5, str)
+            tiger_pass(a,b,c,5, x)
         if i == 1:
-            tiger_pass(a,b,c,7, str)
+            tiger_pass(a,b,c,7, x)
         if i == 2:
-            tiger_pass(a,b,c,9, str)
+            tiger_pass(a,b,c,9, x)
         tmpa = a
         a = c
         c = b
