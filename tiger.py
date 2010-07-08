@@ -5,16 +5,18 @@ def tiger_round(a,b,c,x,mul):
     a -= t1[((c) >> (0*8))&0xFF] ^ t2[((c) >> ( 2*8)) & 0xFF] ^ t3[((c) >> (4*8))&0xFF] ^ t4[((c) >> ( 6*8)) & 0xFF]
     b += t4[((c) >> (1*8))&0xFF] ^ t3[((c) >> ( 3*8)) & 0xFF] ^ t2[((c) >> (5*8))&0xFF] ^ t1[((c) >> ( 7*8)) & 0xFF] 
     b *= mul
+    b &= 0xffffffffffffffff
+    return {"a": a, "b":b, "c": c}
 
 def tiger_pass(a,b,c,mul, str):
-    tiger_round(a,b,c, str[0], mul)
-    tiger_round(b,c,a,str[1],mul)
-    tiger_round(c,a,b, str[2], mul)
-    tiger_round(a,b,c,str[3],mul)
-    tiger_round(b,c,a,str[4],mul)
-    tiger_round(c,a,b,str[5],mul)
-    tiger_round(a,b,c,str[6],mul)
-    tiger_round(b,c,a,str[7],mul)
+    values = tiger_round(a,b,c, str[0], mul)
+    values = tiger_round(values["b"], values["c"], values["a"],str[1],mul)
+    values = tiger_round(values["c"], values["a"], values["b"], str[2], mul)
+    values = tiger_round(values["a"], values["b"], values["c"],str[3],mul)
+    values = tiger_round(values["b"], values["c"], values["a"],str[4],mul)
+    values = tiger_round(values["c"], values["a"], values["b"],str[5],mul)
+    values = tiger_round(values["a"], values["b"], values["c"],str[6],mul)
+    values = tiger_round(values["b"], values["c"], values["a"],str[7],mul)
 
 def tiger_compress(str, r1, r2, r3):
     #setup

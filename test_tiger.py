@@ -15,9 +15,12 @@ class TigerTestCase(unittest.TestCase):
         c = 518233413090174763
         x = 12311797252403697916
         mul = 7
-        tiger.tiger_round(a,b,c,x,mul)
+        ret_values = tiger.tiger_round(a,b,c,x,mul)
 
-        assert a == 4821272432160810520, "a failed: " + str(a) + " != 4821272432160810520\n"
-        assert b == 17424479681440429243, "b failed: " + str(b) + " != 17424479681440429243\n"
-        assert c == 12532788606137106391, "c failed: " + str(c) + " != 12532788606137106391\n" 
-
+        assert ret_values["a"] == 4821272432160810520, \
+            "a failed: " + str(ret_values["a"]) + " != 4821272432160810520\n"
+        assert ret_values["c"] == 12532788606137106391, \
+            "c failed: " + str(ret_values["c"]) + " != 12532788606137106391\n" 
+        assert ret_values["b"] == 17424479681440429243, \
+            "b failed: " + str(ret_values["b"]) + " != 17424479681440429243\n"
+ 
