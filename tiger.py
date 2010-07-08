@@ -69,11 +69,10 @@ def tiger_compress(str, r1, r2, r3):
     r2 = b
     r3 = c
 
-str = "HACK THE PLANET. HACK THE WORLD"
+def hash(str):
+    result0 = 0x0123456789ABCDEF
+    result1 = 0xFEDCBA9876543210
+    result2 = 0xF096A5B4C3B2E187
 
-result0 = 0x0123456789ABCDEF
-result1 = 0xFEDCBA9876543210
-result2 = 0xF096A5B4C3B2E187
-
-for i in range(0, len(str) / 8 ):
-    tiger_compress( str[i*8:i*8+8], result0, result1, result2 ) 
+    for i in range(0, len(str) / 8 ):
+        tiger_compress( str[i*8:i*8+8], result0, result1, result2 ) 

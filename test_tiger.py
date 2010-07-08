@@ -5,14 +5,19 @@ import tiger
 
 class TigerTestCase(unittest.TestCase):
     
-    def test_firstpass_compress(self):
-        
-        r1 = 0x0123456789ABCDEF
-        r2 = 0xFEDCBA9876543210
-        r3 = 0xF096A5B4C3B2E187
- 
-        tiger.compress("TESTING!", r1, r2, r3)
-        assert r1 == 0xfff, r1 + " != " + str(0xfff) + "\n"
-        assert r2 == 0xddd, r2 + " != " + str(0xddd) + "\n"
-        assert r3 == 0xaaa, r3 + " != " + str(0xaaa) + "\n"
+    def test_hash1(self):        
+        hashval = tiger.hash("TESTING!")
+        assert hashval == "lol", hashval + " != lol\n"
+
+    def test_tiger_round(self):
+        a = 13065445776871430898 
+        b = 17855811585246249540
+        c = 518233413090174763
+        x = 12311797252403697916
+        mul = 7
+        tiger.tiger_round(a,b,c,x,mul)
+
+        assert a == 4821272432160810520, "a failed: " + str(a) + " != 4821272432160810520\n"
+        assert b == 17424479681440429243, "b failed: " + str(b) + " != 17424479681440429243\n"
+        assert c == 12532788606137106391, "c failed: " + str(c) + " != 12532788606137106391\n" 
 
