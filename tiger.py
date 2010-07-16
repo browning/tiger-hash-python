@@ -17,6 +17,7 @@ def tiger_pass(a,b,c,mul, str):
     values = tiger_round(values["c"], values["a"], values["b"],str[5],mul)
     values = tiger_round(values["a"], values["b"], values["c"],str[6],mul)
     values = tiger_round(values["b"], values["c"], values["a"],str[7],mul)
+    return values
 
 def tiger_compress(str, r1, r2, r3):
     #setup
