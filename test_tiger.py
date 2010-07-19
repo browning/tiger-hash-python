@@ -24,6 +24,23 @@ class TigerTestCase(unittest.TestCase):
         assert ret_values["b"] == 17424479681440429243, \
             "b failed: " + str(ret_values["b"]) + " != 17424479681440429243\n"
 
+    def test_tiger_round2(self):
+        a =  6280199717849618378
+        b =  8343645101657805456
+        c =  5997044206234503415
+
+        x = 12062177936022666431
+        mul = 9
+        ret_values = tiger.tiger_round(a,b,c,x,mul)
+
+        assert ret_values["a"] == 11604645957211426640, \
+            "a failed: " + str(ret_values["a"]) + " != 11604645957211426640\n"
+        assert ret_values["c"] == 17608143266212181064, \
+            "c failed: " + str(ret_values["c"]) + " != 17608143266212181064\n" 
+        assert ret_values["b"] == 3986339792283275959, \
+            "b failed: " + str(ret_values["b"]) + " != 3986339792283275959\n"
+
+    
     """
     Results from reference:
     A: 6280199717849618378
