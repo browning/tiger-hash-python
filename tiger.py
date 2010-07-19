@@ -79,6 +79,7 @@ def tiger_compress(str, r1, r2, r3):
     r1 = a
     r2 = b
     r3 = c
+    return { "r1": r1, "r2": r2, "r3": r3 }
 
 def hash(str):
     result0 = 0x0123456789ABCDEF

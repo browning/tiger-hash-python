@@ -68,6 +68,20 @@ def test_tiger_pass():
         "c failed, " + str(ret_values["c"]) + " != 2725617220977123037"
 
 
+def test_tiger_compress():
+    x = [chr(1),chr(0),chr(0),chr(0),chr(0),chr(0),chr(0),chr(0)]
+    r1 = 81985529216486895 
+    r2 = 18364758544493064720
+    r3 = 17336226011405279623
+
+    values = tiger.tiger_compress(x,r1,r2,r3)
+    assert values["r1"] == 2661648323708752690, \
+        "r1 failed, " + str(values["r1"]) + "!= 2661648323708752690"
+    assert values["r2"] == 1591580974389105247, \
+        "r2 failed, " + str(values["r2"]) + "!= 1591580974389105247"
+    assert values["r3"] == 17542609259623632506, \
+        "r3 failed, " + str(values["r3"]) + "!= 17542609259623632506"
+
 
 
 
