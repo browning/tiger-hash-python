@@ -11,15 +11,20 @@ def tiger_round(a,b,c,x,mul):
     c &= 0xffffffffffffffff
     return {"a": a, "b":b, "c": c}
 
-def tiger_pass(a,b,c,mul, str):
-    values = tiger_round(a,b,c, str[0], mul)
-    values = tiger_round(values["b"], values["c"], values["a"],str[1],mul)
-    values = tiger_round(values["c"], values["a"], values["b"], str[2], mul)
-    values = tiger_round(values["a"], values["b"], values["c"],str[3],mul)
-    values = tiger_round(values["b"], values["c"], values["a"],str[4],mul)
-    values = tiger_round(values["c"], values["a"], values["b"],str[5],mul)
-    values = tiger_round(values["a"], values["b"], values["c"],str[6],mul)
-    values = tiger_round(values["b"], values["c"], values["a"],str[7],mul)
+def tiger_pass(a,b,c,mul, mystr):
+    values = tiger_round(a,b,c, mystr[0], mul)
+    values = tiger_round(values["b"], values["c"], values["a"],mystr[1],mul)
+    values = { "b": values["a"], "c": values["b"], "a": values["c"] }
+    values = tiger_round(values["c"], values["a"], values["b"], mystr[2], mul)
+    values = { "c": values["a"], "a": values["b"], "b": values["c"] }
+    values = tiger_round(values["a"], values["b"], values["c"],mystr[3],mul)
+    values = tiger_round(values["b"], values["c"], values["a"],mystr[4],mul)
+    values = { "b": values["a"], "c": values["b"], "a": values["c"] }
+    values = tiger_round(values["c"], values["a"], values["b"],mystr[5],mul)
+    values = { "c": values["a"], "a":values["b"], "b": values["c"] }
+    values = tiger_round(values["a"], values["b"], values["c"],mystr[6],mul)
+    values = tiger_round(values["b"], values["c"], values["a"],mystr[7],mul)
+    values = { "b": values["a"], "c":values["b"], "a": values["c"]}
     return values
 
 def tiger_compress(str, r1, r2, r3):
