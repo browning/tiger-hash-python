@@ -1,8 +1,9 @@
+# These tests can be run using nosetests
+
 import unittest
 import sys
 import os
 import tiger
-
     
 def round_helper(a, b, c, x, mul, new_a,new_b,new_c):
     ret_values = tiger.tiger_round(a,b,c,x,mul)
@@ -20,12 +21,12 @@ def test_tiger_round():
         4821272432160810520,17424479681440429243,12532788606137106391)
 
 def test_tiger_round2():
-    round_helper(6280199717849618378, 8343645101657805456, 5997044206234503415, \
+    round_helper(6280199717849618378, 8343645101657805456, 5997044206234503415,\
         12062177936022666431, 9, \
         11604645957211426640, 3986339792283275959, 17608143266212181064)
 
 def test_tiger_round3():
-    round_helper(11604645957211426640, 3986339792283275959, 17608143266212181064, \
+    round_helper(11604645957211426640,3986339792283275959,17608143266212181064,\
         11490956213547313652, 9, \
         6441804261801137295,13333871996800360137,7720474646982516156)
 
@@ -69,21 +70,39 @@ def test_tiger_pass():
 
 
 def test_tiger_compress():
-    x = [chr(1),chr(0),chr(0),chr(0),chr(0),chr(0),chr(0),chr(0)]
-    r1 = 81985529216486895 
-    r2 = 18364758544493064720
-    r3 = 17336226011405279623
+    # input data for tiger_compress must be 64 bytes long
+    x = "TigerTigerTigerTigerTigerTigerTigerTigerTigerTigerTigerTigerTige"
+    res = [ 81985529216486895, 18364758544493064720, 17336226011405279623]
 
-    values = tiger.tiger_compress(x,r1,r2,r3)
-    assert values["r1"] == 2661648323708752690, \
-        "r1 failed, " + str(values["r1"]) + "!= 2661648323708752690"
-    assert values["r2"] == 1591580974389105247, \
-        "r2 failed, " + str(values["r2"]) + "!= 1591580974389105247"
-    assert values["r3"] == 17542609259623632506, \
-        "r3 failed, " + str(values["r3"]) + "!= 17542609259623632506"
+    tiger.tiger_compress(x, res)
+    assert res[0] == 0x29CCDEE812891C0F, \
+        "r1 failed, %X != 0x29CCDEE812891C0F" % res[0]
+    assert res[1] == 0xA18BA64634ACD11A, \
+        "r2 failed, %X != 0xA18BA64634ACD11A" % res[1]
+    assert res[2] == 0x5FA4D4854FCE7BCA, \
+        "r3 failed, %X != 0x5FA4D4854FCE7BCA" % res[2]
 
-
-
-
+# The following are the test hashes provided by the example C implementation
+def test_tiger_hash():
+    assert tiger.hash('') == '24F0130C63AC933216166E76B1BB925FF373DE2D49584E7A'
+    assert tiger.hash('abc') == \
+        'F258C1E88414AB2A527AB541FFC5B8BF935F7B951C132951'
+    assert tiger.hash('Tiger') == \
+        '9F00F599072300DD276ABB38C8EB6DEC37790C116F9D2BDF'
+    assert tiger.hash("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01" \
+        "23456789+-") == '87FB2A9083851CF7470D2CF810E6DF9EB586445034A5A386'
+    assert tiger.hash("ABCDEFGHIJKLMNOPQRSTUVWXYZ=abcdefghijklmnopqrstuvwxyz+" \
+        "0123456789") == '467DB80863EBCE488DF1CD1261655DE957896565975F9197'
+    assert tiger.hash("Tiger - A Fast New Hash Function, by Ross Anderson and" \
+        " Eli Biham") == '0C410A042968868A1671DA5A3FD29A725EC1E457D3CDB303'
+    assert tiger.hash("Tiger - A Fast New Hash Function, by Ross Anderson and" \
+        " Eli Biham, proceedings of Fast Software Encryption 3, Cambridge.")== \
+        'EBF591D5AFA655CE7F22894FF87F54AC89C811B6B0DA3193'
+    assert tiger.hash("Tiger - A Fast New Hash Function, by Ross Anderson and" \
+        " Eli Biham, proceedings of Fast Software Encryption 3, Cambridge, 19" \
+        "96.") == '3D9AEB03D1BD1A6357B2774DFD6D5B24DD68151D503974FC'
+    assert tiger.hash("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01" \
+        "23456789+-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345" \
+        "6789+-") == '00B83EB4E53440C576AC6AAEE0A7485825FD15E70A59FFE4'
       
  

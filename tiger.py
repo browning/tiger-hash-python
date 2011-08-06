@@ -1,10 +1,12 @@
+import array
+import struct
 from sboxes import t1, t2, t3, t4
 
 def tiger_round(a,b,c,x,mul):
     c ^= x
     c &= 0xffffffffffffffff
     a -= t1[((c) >> (0*8))&0xFF] ^ t2[((c) >> ( 2*8)) & 0xFF] ^ t3[((c) >> (4*8))&0xFF] ^ t4[((c) >> ( 6*8)) & 0xFF]
-    b += t4[((c) >> (1*8))&0xFF] ^ t3[((c) >> ( 3*8)) & 0xFF] ^ t2[((c) >> (5*8))&0xFF] ^ t1[((c) >> ( 7*8)) & 0xFF] 
+    b += t4[((c) >> (1*8))&0xFF] ^ t3[((c) >> ( 3*8)) & 0xFF] ^ t2[((c) >> (5*8))&0xFF] ^ t1[((c) >> ( 7*8)) & 0xFF]
     b *= mul
     a &= 0xffffffffffffffff
     b &= 0xffffffffffffffff
@@ -27,64 +29,103 @@ def tiger_pass(a,b,c,mul, mystr):
     values = { "b": values["a"], "c":values["b"], "a": values["c"]}
     return values
 
-def tiger_compress(str, r1, r2, r3):
+def tiger_compress(str, res):
     #setup
-    a = r1
-    b = r2
-    c = r3
+    a = res[0]
+    b = res[1]
+    c = res[2]
     
     x = []
 
-    for i in range(0,8):
-        x.append( ord(str[i]) )
+    for j in range(0,8):
+        x.append(struct.unpack('Q', str[j*8:j*8+8])[0])
 
     # compress
     aa = a
     bb = b
     cc = c
-    for i in range(0, 2):
+    allf = 0xFFFFFFFFFFFFFFFF
+    for i in range(0, 3):
         if i != 0:
-            x[0] -= x[7] ^  0xA5A5A5A5A5A5A5A5
+            x[0] = (x[0] - (x[7] ^ 0xA5A5A5A5A5A5A5A5)&allf ) & allf
             x[1] ^= x[0]
-            x[2] += x[1]
-            x[3] -= x[2] ^ ((~x[1]) << 19)
+            x[2] = (x[2] + x[1]) & allf
+            x[3] = (x[3] - (x[2] ^ (~x[1]&allf) << 19)&allf) & allf
             x[4] ^= x[3]
-            x[5] += x[4]
-            x[6] -= x[5] ^ ((~x[4]) >> 23)
+            x[5] = (x[5] + x[4]) & allf
+            x[6] = (x[6] - (x[5] ^ (~x[4]&allf) >> 23)&allf) & allf
             x[7] ^= x[6]
-            x[0] += x[7]
-            x[1] -= x[0] ^ ((~x[7])<<19)
+            x[0] = (x[0] + x[7]) & allf
+            x[1] = (x[1] - (x[0] ^ (~x[7]&allf) << 19)&allf) & allf
             x[2] ^= x[1]
-            x[3] += x[2] 
-            x[4] -= x[3] ^ ((~x[2])>>23)
+            x[3] = (x[3] + x[2]) & allf
+            x[4] = (x[4] - (x[3] ^ (~x[2]&allf) >> 23)&allf) & allf
             x[5] ^= x[4] 
-            x[6] += x[5] 
-            x[7] -= x[6] ^ 0x0123456789ABCDEF
+            x[6] = (x[6] + x[5]) & allf
+            x[7] = (x[7] - (x[6] ^ 0x0123456789ABCDEF)&allf ) & allf
 
         if i == 0:
-            tiger_pass(a,b,c,5, x)
-        if i == 1:
-            tiger_pass(a,b,c,7, x)
-        if i == 2:
-            tiger_pass(a,b,c,9, x)
+            vals = tiger_pass(a,b,c,5, x)
+            a = vals['a']
+            b = vals['b']
+            c = vals['c']
+        elif i == 1:
+            vals = tiger_pass(a,b,c,7, x)
+            a = vals['a']
+            b = vals['b']
+            c = vals['c']
+        else:
+            vals = tiger_pass(a,b,c,9, x)
+            a = vals['a']
+            b = vals['b']
+            c = vals['c']
         tmpa = a
         a = c
         c = b
         b = tmpa
     a ^= aa
-    b -= bb
-    c += cc
+    b = (b - bb) & allf
+    c = (c + cc) & allf
 
     # map values out
-    r1 = a
-    r2 = b
-    r3 = c
-    return { "r1": r1, "r2": r2, "r3": r3 }
+    res[0] = a
+    res[1] = b
+    res[2] = c
 
 def hash(str):
-    result0 = 0x0123456789ABCDEF
-    result1 = 0xFEDCBA9876543210
-    result2 = 0xF096A5B4C3B2E187
+    i = 0
 
-    for i in range(0, len(str) / 8 ):
-        tiger_compress( str[i*8:i*8+8], result0, result1, result2 ) 
+    res = [0x0123456789ABCDEF, 0xFEDCBA9876543210, 0xF096A5B4C3B2E187]
+    offset = 0
+    length = len(str)
+    while i < length-63:
+        tiger_compress( str[i:i+64], res )
+        i += 64
+    temp = array.array('c', str[i:])
+    j = len(temp)
+    temp.append(chr(0x01))
+    j += 1
+    
+    while j&7 != 0:
+        temp.append(chr(0))
+        j += 1
+
+    if j > 56:
+        while j < 64:
+            temp.append(chr(0))
+            j += 1
+        tiger_compress(temp, res)
+        j = 0
+
+    # make the first 56 bytes 0
+    temp.extend([chr(0) for i in range(0, 56-j)])
+    while j < 56:
+        temp[j] = chr(0)
+        j += 1
+    while len(temp) > 56:
+        temp.pop(56)
+
+    temp.fromstring(struct.pack('Q', length<<3))
+    tiger_compress(temp, res)
+    
+    return "%016X%016X%016X" % (res[0], res[1], res[2])
